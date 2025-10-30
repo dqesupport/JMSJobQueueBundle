@@ -24,6 +24,7 @@ class ManyToAnyListener
     {
         $this->registry = $registry;
         $this->ref = new \ReflectionProperty('JMS\JobQueueBundle\Entity\Job', 'relatedEntities');
+        $this->ref->setAccessible(true);
     }
 
     public function postLoad(\Doctrine\ORM\Event\LifecycleEventArgs $event)
