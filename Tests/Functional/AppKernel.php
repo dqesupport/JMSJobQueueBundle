@@ -69,14 +69,4 @@ class AppKernel extends Kernel
     {
         return sys_get_temp_dir().'/'.Kernel::VERSION.'/JMSJobQueueBundle/'.substr(sha1($this->config), 0, 6).'/logs';
     }
-
-    public function serialize()
-    {
-        return $this->config;
-    }
-
-    public function unserialize($config)
-    {
-        $this->__construct($config);
-    }
 }
