@@ -4,8 +4,9 @@ namespace JMS\JobQueueBundle\Console;
 
 declare(ticks = 10000000);
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\DBAL\Statement;
-use Doctrine\DBAL\Types\Type;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,7 +38,7 @@ class Application extends BaseApplication
         }
     }
 
-    public function doRun(InputInterface $input, OutputInterface $output)
+    public function doRun(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
 
@@ -68,7 +69,7 @@ class Application extends BaseApplication
         }
 
         $this->insertStatStmt->bindValue('jobId', $jobId, \PDO::PARAM_INT);
-        $this->insertStatStmt->bindValue('createdAt', new \DateTime(), Type::getType('datetime'));
+        $this->insertStatStmt->bindValue('createdAt', new \DateTime(), Types::DATETIME_MUTABLE);
 
         foreach ($characteristics as $name => $value) {
             $this->insertStatStmt->bindValue('name', $name);
@@ -83,7 +84,7 @@ class Application extends BaseApplication
             return;
         }
 
-        $this->getConnection()->executeUpdate(
+        $this->getConnection()->executeStatement(
             "UPDATE jms_jobs SET stackTrace = :trace, memoryUsage = :memoryUsage, memoryUsageReal = :memoryUsageReal WHERE id = :id",
             array(
                 'id' => $jobId,
@@ -100,7 +101,7 @@ class Application extends BaseApplication
         );
     }
 
-    private function getConnection()
+    private function getConnection(): Connection
     {
         return $this->getKernel()->getContainer()->get('doctrine')->getManagerForClass('JMSJobQueueBundle:Job')->getConnection();
     }

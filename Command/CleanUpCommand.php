@@ -37,7 +37,7 @@ class CleanUpCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(Job::class);
@@ -46,7 +46,7 @@ class CleanUpCommand extends Command
         $this->cleanUpExpiredJobs($em, $con, $input);
         $this->collectStaleJobs($em);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function collectStaleJobs(EntityManager $em)
@@ -137,7 +137,7 @@ class CleanUpCommand extends Command
             }
         }
 
-        $em->getConnection()->executeUpdate("DELETE FROM jms_job_dependencies WHERE dest_job_id = :id", array('id' => $job->getId()));
+        $em->getConnection()->executeStatement("DELETE FROM jms_job_dependencies WHERE dest_job_id = :id", array('id' => $job->getId()));
     }
 
     private function findExpiredJobs(EntityManager $em, InputInterface $input)
