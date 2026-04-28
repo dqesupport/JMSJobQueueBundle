@@ -99,7 +99,7 @@ class JobController
         $statisticData = $statisticOptions = array();
         if ($this->enableStats) {
             $dataPerCharacteristic = array();
-            foreach ($this->managerRegistry->getManagerForClass(Job::class)->getConnection()->query("SELECT * FROM jms_job_statistics WHERE job_id = ".$job->getId()) as $row) {
+            foreach ($this->managerRegistry->getManagerForClass(Job::class)->getConnection()->executeQuery("SELECT * FROM jms_job_statistics WHERE job_id = :id", ['id' => $job->getId()])->fetchAllAssociative() as $row) {
                 $dataPerCharacteristic[$row['characteristic']][] = array(
                     // hack because postgresql lower-cases all column names.
                     array_key_exists('createdAt', $row) ? $row['createdAt'] : $row['createdat'],

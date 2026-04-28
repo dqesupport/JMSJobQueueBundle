@@ -74,7 +74,7 @@ class Application extends BaseApplication
         foreach ($characteristics as $name => $value) {
             $this->insertStatStmt->bindValue('name', $name);
             $this->insertStatStmt->bindValue('value', $value);
-            $this->insertStatStmt->execute();
+            $this->insertStatStmt->executeStatement();
         }
     }
 
