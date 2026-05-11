@@ -13,10 +13,10 @@
     ],
     "require": {
         "php": "^7.4 || ^8.0",
-        "symfony/framework-bundle": "^5.4 || ^6.4",
-        "symfony/error-handler": "^5.4 || ^6.4",
+        "symfony/framework-bundle": "^5.4 || ^6.4 || ^7.0",
+        "symfony/error-handler": "^5.4 || ^6.4 || ^7.0",
         "doctrine/common": "^3.2",
-        "symfony/process": "^5.4 || ^6.4"
+        "symfony/process": "^5.4 || ^6.4 || ^7.0"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "*",
