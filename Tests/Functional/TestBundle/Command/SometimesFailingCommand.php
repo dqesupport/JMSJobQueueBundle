@@ -2,15 +2,15 @@
 
 namespace JMS\JobQueueBundle\Tests\Functional\TestBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 
+#[AsCommand(name: 'jms-job-queue:sometimes-failing-cmd')]
 class SometimesFailingCommand extends Command
 {
-    protected static $defaultName = 'jms-job-queue:sometimes-failing-cmd';
-
     protected function configure()
     {
         $this
@@ -18,7 +18,7 @@ class SometimesFailingCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $expired = time() - $input->getArgument('time');
 

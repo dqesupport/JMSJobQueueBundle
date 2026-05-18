@@ -2,16 +2,16 @@
 
 namespace JMS\JobQueueBundle\Tests\Functional\TestBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'jms-job-queue:logging-cmd')]
 class LoggingCommand extends Command
 {
-    protected static $defaultName = 'jms-job-queue:logging-cmd';
-
     protected function configure()
     {
         $this
@@ -21,7 +21,7 @@ class LoggingCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         file_put_contents($input->getArgument('file'), $input->getArgument('name').' started'.PHP_EOL, FILE_APPEND);
         sleep($input->getOption('runtime'));
