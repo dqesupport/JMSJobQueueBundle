@@ -309,7 +309,7 @@ class MemoryOutput extends Output
 {
     private $output;
 
-    protected function doWrite($message, $newline)
+    protected function doWrite(string $message, bool $newline): void
     {
         $this->output .= $message;
 
