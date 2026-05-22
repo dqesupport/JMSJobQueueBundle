@@ -60,7 +60,7 @@ class JMSJobQueueExtension extends Extension implements PrependExtensionInterfac
         $container->setParameter('jms_job_queue.queue_options', $config['queue_options']);
     }
 
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         $container->prependExtensionConfig('doctrine', array(
             'dbal' => array(

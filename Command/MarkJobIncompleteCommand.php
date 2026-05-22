@@ -27,7 +27,7 @@ class MarkJobIncompleteCommand extends Command
         $this->jobManager = $jobManager;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('job-id', InputArgument::REQUIRED, 'The ID of the Job.')

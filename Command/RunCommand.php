@@ -79,7 +79,7 @@ class RunCommand extends Command
         $this->queueOptions = $queueOptions;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('max-runtime', 'r', InputOption::VALUE_REQUIRED, 'The maximum runtime in seconds.', 900)

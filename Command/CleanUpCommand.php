@@ -28,7 +28,7 @@ class CleanUpCommand extends Command
         $this->registry = $registry;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('max-retention', null, InputOption::VALUE_REQUIRED, 'The maximum retention time (value must be parsable by DateTime).', '7 days')
