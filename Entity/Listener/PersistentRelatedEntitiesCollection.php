@@ -240,6 +240,26 @@ class PersistentRelatedEntitiesCollection implements Collection, Selectable
         return false;
     }
 
+    public function findFirst(Closure $p): mixed
+    {
+        $this->initialize();
+
+        foreach ($this->entities as $key => $element) {
+            if ($p($key, $element)) {
+                return $element;
+            }
+        }
+
+        return null;
+    }
+
+    public function reduce(Closure $func, mixed $initial = null): mixed
+    {
+        $this->initialize();
+
+        return array_reduce($this->entities, $func, $initial);
+    }
+
     /**
      * Searches for a given element and, if found, returns the corresponding key/index
      * of that element. The comparison of two elements is strict, that means not

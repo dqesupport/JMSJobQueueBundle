@@ -5,6 +5,7 @@ namespace JMS\JobQueueBundle\Console;
 declare(ticks = 10000000);
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\DBAL\Statement;
 use JMS\JobQueueBundle\Entity\Job;
@@ -69,7 +70,7 @@ class Application extends BaseApplication
             $this->insertStatStmt = $this->getConnection()->prepare($this->insertStatStmt);
         }
 
-        $this->insertStatStmt->bindValue('jobId', $jobId, \PDO::PARAM_INT);
+        $this->insertStatStmt->bindValue('jobId', $jobId, ParameterType::INTEGER);
         $this->insertStatStmt->bindValue('createdAt', new \DateTime(), Types::DATETIME_MUTABLE);
 
         foreach ($characteristics as $name => $value) {
@@ -94,10 +95,10 @@ class Application extends BaseApplication
                 'trace' => serialize($ex ? FlattenException::create($ex) : null),
             ),
             array(
-                'id' => \PDO::PARAM_INT,
-                'memoryUsage' => \PDO::PARAM_INT,
-                'memoryUsageReal' => \PDO::PARAM_INT,
-                'trace' => \PDO::PARAM_LOB,
+                'id' => ParameterType::INTEGER,
+                'memoryUsage' => ParameterType::INTEGER,
+                'memoryUsageReal' => ParameterType::INTEGER,
+                'trace' => ParameterType::LARGE_OBJECT,
             )
         );
     }
