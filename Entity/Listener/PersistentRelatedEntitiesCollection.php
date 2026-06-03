@@ -465,6 +465,7 @@ class PersistentRelatedEntitiesCollection implements Collection, Selectable
 
     /**
      * Clears the collection.
+     * @return void
      */
     public function clear()
     {
