@@ -4,9 +4,17 @@ namespace JMS\JobQueueBundle\Entity\Type;
 
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\Exception\ValueNotConvertible;
 use Doctrine\DBAL\Types\Type;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
+/**
+ * Хранит сериализованный {@see FlattenException} (стек-трейс задачи) в BLOB.
+ *
+ * Тип "безопасный" в том смысле, что при чтении он никогда не роняет
+ * гидрацию Job: если данные битые или сериализованы под прежним namespace
+ * (что бывает после переездов классов между версиями Symfony), вместо
+ * исключения возвращается null — стек-трейс лишь отладочная информация.
+ */
 class SafeObjectType extends Type
 {
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
@@ -33,9 +41,17 @@ class SafeObjectType extends Type
             $value = stream_get_contents($value);
         }
 
-        $result = @unserialize($value);
-        if ($result === false && $value !== serialize(false)) {
-            throw ValueNotConvertible::new($value, 'jms_job_safe_object');
+        if (!is_string($value) || $value === '') {
+            return null;
+        }
+
+        $result = @unserialize($value, ['allowed_classes' => [FlattenException::class]]);
+
+        // false  — битая/неполная строка либо отсутствие данных (например, 'N;')
+        // __PHP_Incomplete_Class — объект сериализован под классом, которого
+        //                          больше нет (старый namespace FlattenException)
+        if ($result === false || $result instanceof \__PHP_Incomplete_Class) {
+            return null;
         }
 
         return $result;
