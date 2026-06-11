@@ -4,16 +4,12 @@ namespace JMS\JobQueueBundle\Entity\Type;
 
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\Exception\SerializationFailed;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 /**
  * Хранит сериализованный {@see FlattenException} (стек-трейс задачи) в BLOB.
- *
- * Тип "безопасный" в том смысле, что при чтении он никогда не роняет
- * гидрацию Job: если данные битые или сериализованы под прежним namespace
- * (что бывает после переездов классов между версиями Symfony), вместо
- * исключения возвращается null — стек-трейс лишь отладочная информация.
  */
 class SafeObjectType extends Type
 {
@@ -22,12 +18,8 @@ class SafeObjectType extends Type
         return $platform->getBlobTypeDeclarationSQL($column);
     }
 
-    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
     {
-        if ($value === null) {
-            return null;
-        }
-
         return serialize($value);
     }
 
@@ -37,24 +29,17 @@ class SafeObjectType extends Type
             return null;
         }
 
-        if (is_resource($value)) {
-            $value = stream_get_contents($value);
+        $value = is_resource($value) ? stream_get_contents($value) : $value;
+
+        set_error_handler(function (int $code, string $message) use ($value): bool {
+            throw SerializationFailed::new($value, 'jms_job_safe_object', $message);
+        });
+
+        try {
+            return unserialize($value);
+        } finally {
+            restore_error_handler();
         }
-
-        if (!is_string($value) || $value === '') {
-            return null;
-        }
-
-        $result = @unserialize($value, ['allowed_classes' => [FlattenException::class]]);
-
-        // false  — битая/неполная строка либо отсутствие данных (например, 'N;')
-        // __PHP_Incomplete_Class — объект сериализован под классом, которого
-        //                          больше нет (старый namespace FlattenException)
-        if ($result === false || $result instanceof \__PHP_Incomplete_Class) {
-            return null;
-        }
-
-        return $result;
     }
 
     public function getBindingType(): ParameterType
